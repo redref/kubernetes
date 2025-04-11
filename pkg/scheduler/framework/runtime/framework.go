@@ -734,6 +734,18 @@ func (f *frameworkImpl) RunFilterPlugins(
 			if !pluginStatus.IsUnschedulable() {
 				// Filter plugins are not supposed to return any status other than
 				// Success or Unschedulable.
+				var podName, nodeName string
+				if pod != nil {
+					podName = pod.Name
+				} else {
+					podName = "<nil>"
+				}
+				if nodeInfo != nil && nodeInfo.Node() != nil {
+					nodeName = nodeInfo.Node().Name
+				} else {
+					nodeName = "<nil>"
+				}
+				logger.V(4).Info("Finished running filter plugin", "plugin", pl.Name(), "pod", podName, "node", nodeName, "status", status.Code().String())
 				pluginStatus = framework.AsStatus(fmt.Errorf("running %q filter plugin: %w", pl.Name(), pluginStatus.AsError()))
 			}
 			pluginStatus.SetFailedPlugin(pl.Name())
