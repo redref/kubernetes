@@ -715,8 +715,21 @@ func (f *frameworkImpl) RunFilterPlugins(
 ) framework.PluginToStatus {
 	statuses := make(framework.PluginToStatus)
 	for _, pl := range f.filterPlugins {
+		var podName, nodeName string
+		if pod != nil {
+			podName = pod.Name
+		} else {
+			podName = "<nil>"
+		}
+		if nodeInfo != nil && nodeInfo.Node() != nil {
+			nodeName = nodeInfo.Node().Name
+		} else {
+			nodeName = "<nil>"
+		}
+
 		pluginStatus := f.runFilterPlugin(ctx, pl, state, pod, nodeInfo)
 		if !pluginStatus.IsSuccess() {
+			klog.V(3).InfoS("Finished running filter plugin", "plugin", pl.Name(), "pod", podName, "node", nodeName, "status", pluginStatus.Code().String())
 			if !pluginStatus.IsUnschedulable() {
 				// Filter plugins are not supposed to return any status other than
 				// Success or Unschedulable.
