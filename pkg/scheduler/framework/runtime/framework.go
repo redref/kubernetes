@@ -736,6 +736,7 @@ func (f *frameworkImpl) RunFilterPlugins(
 				// Success or Unschedulable.
 				pluginStatus = framework.AsStatus(fmt.Errorf("running %q filter plugin: %w", pl.Name(), pluginStatus.AsError()))
 			}
+			klog.V(3).InfoS("Filter plugin unsuccessfull on node", "plugin", pl.Name(), "pod", pod.Name, "node", nodeInfo.Node().Name, "status", pluginStatus.Code().String())
 			pluginStatus.SetFailedPlugin(pl.Name())
 			return map[string]*framework.Status{pl.Name(): pluginStatus}
 		}
